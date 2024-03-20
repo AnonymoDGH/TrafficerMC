@@ -1,42 +1,10 @@
-const { app, ipcMain, BrowserWindow, ipcRenderer } = require('electron')
-const Store = require('electron-store');
-const store = new Store();
+const express = require('express');
+const path = require('path');
 
-app.on('ready', () => {
-    const mainWindow = new BrowserWindow({
-        width: 970,
-        height: 530,
-        show: false,
-        //resizable: false,
-        autoHideMenuBar: true,
-        titleBarStyle: 'hidden',
-        webPreferences: {
-          // devTools: false,
-          nodeIntegration: true,
-          contextIsolation: false
-        }
-      });
-      mainWindow.loadFile("src/index.html")
-      mainWindow.on('ready-to-show', () => {
-        mainWindow.show()
-        mainWindow.webContents.setBackgroundThrottling(false)
-        app.focus()
-      });
-      
-      ipcMain.on('minimize', () => {
-        mainWindow.minimize()
-    });
-    
-    mainWindow.webContents.once('dom-ready', () => {
-        mainWindow.webContents.send('restore', store.get('config'))
-        mainWindow.webContents.send('restoreTheme', store.get('theme'))
-    });
-});
+const app = express();
 
-ipcMain.on('config', (event, config) => {
-    store.set('config', config)
-});
+app.use(express.static(path.join(__dirname, 'src/index.html')));
 
-ipcMain.on('theme', (event, path) => {
-    store.set('theme', path)
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
 });
